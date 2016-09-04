@@ -6,13 +6,23 @@ import code
 import webbrowser
 import re
 
-# Early Link #
-bool_direct_link = False
+#Functions used for testing, eventually incorporate into unit-tests
+def savePage( response, filename ):
+    output = open(filename, 'wb')
+    for chunk in response.iter_content(100000):
+        output.write(chunk)
+def exitConf():
+    closeSession = False
+    while (closeSession == False):
+        input = raw_input('Press E to close session: ')
+        if (input == 'E'):
+            closeSession = True
 
-# URL Presets #
-# Move these members to a profile class eventually #
+# Presets 
+# Move these members to a profile class eventually 
 URL_vendor_url  = 'http://shop.bdgastore.com/'
 URL_direct_link = 'http://shop.bdgastore.com/collections/footwear/products/y-3-pureboost-zg'
+user_size = 8
 
 #################
 ## Main Script ##
@@ -20,41 +30,19 @@ URL_direct_link = 'http://shop.bdgastore.com/collections/footwear/products/y-3-p
 
 user_session = requests.Session()
 session_get  = user_session.get(URL_direct_link)
-
 print 'Status of requests.get: ' + str(session_get.status_code)
-
-#print ping_vendor.text
-#bodegaProdFile = open('test.html', 'wb')
-#for chunk in ping_vendor.iter_content(100000):
-#    bodegaProdFile.write(chunk)
-
-###############################
-#See README for how to proceed#
-###############################
-
-#print session_get.content
+savePage(session_get, 'test2.html')
 
 prod_soup = BeautifulSoup(session_get.content, "lxml")
 #Check that the lxml parser works for html
-#Use SoupStrainer to improve parsing efficiency
+#Look to use SoupStrainer to improve parsing efficiency
 
-user_size = 8
-
-### Block used to save HTML tree of interest ###
-################################################
-# Check Dev Notes for a Concept Review #
 ResultSet = prod_soup.find_all('form', {'id' : 'qv-form'})
-
-#with open('input', 'wb') as ResultSetFile:
-#    ResultSetFile.write(str(ResultSet))
 ResultSetString = unicode.join(u'\n',map(unicode,ResultSet))
-#print ResultSetString
-
 ResultSoup = BeautifulSoup(ResultSetString, "lxml")
 #print ResultSoup.prettify()
 with open('bodegaForm.html', 'wb') as bodegaFormFile:
     bodegaFormFile.write(ResultSoup.prettify())
-################################################
 
 #select: name="id" value=22348567876 (11.5)
 #input:  id="key" name="properties[bot-key]" type="hidden" value="6402243972
@@ -65,16 +53,19 @@ add_to_cart_js = 'http://shop.bdgastore.com/cart/add.js'
 session_post = user_session.post(url=add_to_cart_js, data=post_data)
 
 print str(session_post.status_code)
-print user_session.cookies
+
+session_get  = user_session.get('http://shop.bdgastore.com/')
+print str(user_session.cookies) + '\n'
 
 cookies = dict_from_cookiejar(user_session.cookies)
+print cookies
 
 driver = webdriver.Firefox()
 driver.add_cookie(cookies)
-
+driver.add_cookie({'path':'/'})
 driver.get('http://shop.bdgastore.com/cart')
 #So the posted data gets accepted...but why doesn't the item show in the cart after the cookies get imported?
-
+#Possible Reason: cart_sig cookie is empty
 
 
 # Data of interest:
@@ -98,18 +89,3 @@ driver.get('http://shop.bdgastore.com/cart')
 
 #Uncomment ln 3 and 43 to launch into interpreter
 #code.interact(local=locals())
-
-#####################
-#PROXY AND TIMEOUTS##
-#####################
-
-#import requests
-
-#proxies = {
-#          'http': 'http://10.10.1.10:3128',
-#            'https': 'http://10.10.1.10:1080',
-#            }
-
-#requests.get('http://example.org', proxies=proxies)
-
-#r = requests.get('https://github.com', timeout=5)
