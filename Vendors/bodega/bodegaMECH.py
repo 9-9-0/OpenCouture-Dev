@@ -19,7 +19,6 @@ class bodegaMECH():
         self.item_url = 'http://shop.bdgastore.com/collections/footwear/products/y-3-pureboost-zg'
 
         # Create variables for user credentials and a function to import them
-
     def addToCart(self):
         self.br.open(self.item_url)
         #If possible, remove formcount search from runtime
@@ -41,14 +40,16 @@ class bodegaMECH():
 
     def checkCart(self):
         print self.cj
-        cj_dict = dict_from_cookiejar(self.cj)
+        
+        #driver = webdriver.Firefox()
+        #driver.add_cookie(cj_dict)
+        #driver.get('http://shop.bdgastore.com/cart')
+        #print(driver.get_cookies())
         #for cookie in self.cj:
         #    print cookie.name, cookie.value, cookie.domain
         #try importing cookies manually vs using the requests util
 
-        driver = webdriver.Firefox()
-        driver.add_cookie(cj_dict)
-        driver.get('http://shop.bdgastore.com/cart')
+        #driver = webdriver.Chrome('./chromedriver')
         
 if __name__=='__main__':
     instance = bodegaMECH()
