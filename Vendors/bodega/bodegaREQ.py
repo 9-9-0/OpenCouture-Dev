@@ -5,12 +5,14 @@ from selenium import webdriver
 import code
 import webbrowser
 import re
+import mechanize
 
 #Functions used for testing, eventually incorporate into unit-tests
 def savePage( response, filename ):
     output = open(filename, 'wb')
     for chunk in response.iter_content(100000):
         output.write(chunk)
+
 def exitConf():
     closeSession = False
     while (closeSession == False):
@@ -18,15 +20,23 @@ def exitConf():
         if (input == 'E'):
             closeSession = True
 
+#Modify this to parse for div id=cart
+def checkCart(session):
+    br = mechanize.Browser()
+    br.set_cookiejar(session.cookies)
+    br.set_handle_robots(False)
+    response = br.open('http://shop.bdgastore.com/cart')
+    print response.read()
+
+#################
+## Main Script ##
+#################
+
 # Presets 
 # Move these members to a profile class eventually 
 URL_vendor_url  = 'http://shop.bdgastore.com/'
 URL_direct_link = 'http://shop.bdgastore.com/collections/footwear/products/y-3-pureboost-zg'
 user_size = 8
-
-#################
-## Main Script ##
-#################
 
 user_session = requests.Session()
 session_get  = user_session.get(URL_direct_link)
@@ -54,18 +64,27 @@ session_post = user_session.post(url=add_to_cart_js, data=post_data)
 
 print str(session_post.status_code)
 
-session_get  = user_session.get('http://shop.bdgastore.com/')
-print str(user_session.cookies) + '\n'
+session_get = user_session.get('http://shop.bdgastore.com/cart')
+savePage(session_get, 'bodegaCart.html')
+#Note: This shows the cart is indeed added. See <div id='cart'>
+#Possible reason this is not working: Firefox 3.x+ has a specific format for their cookies...double check this
+checkCart(user_session)
 
-cookies = dict_from_cookiejar(user_session.cookies)
-print cookies
+#session_get  = user_session.get('http://shop.bdgastore.com/')
+#print str(user_session.cookies) + '\n'
 
-driver = webdriver.Firefox()
-driver.add_cookie(cookies)
-driver.add_cookie({'path':'/'})
-driver.get('http://shop.bdgastore.com/cart')
+#cookies = dict_from_cookiejar(user_session.cookies)
+#print cookies
+
+#driver = webdriver.Firefox()
+#driver.add_cookie(cookies)
+#driver.add_cookie({'path':'/'})
+#driver.get('http://shop.bdgastore.com/cart')
 #So the posted data gets accepted...but why doesn't the item show in the cart after the cookies get imported?
 #Possible Reason: cart_sig cookie is empty
+
+
+
 
 
 # Data of interest:
