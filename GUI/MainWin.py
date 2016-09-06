@@ -8,8 +8,22 @@ class MainWin(QtGui.QMainWindow):
         self.initUI()
 
     def initUI(self):
+
+        btnWdgBar = QtGui.QWidget(self)
+        hbox = QtGui.QHBoxLayout(btnWdgBar)
+        
+        okButton = QtGui.QPushButton("OK")
+        hbox.addWidget(okButton)
+        cancelButton = QtGui.QPushButton("Cancel")
+        hbox.addWidget(cancelButton)
+        #cancelButton.move(20,200)
+        #buttonBar.addWidget(okButton)
+        #buttonBar.addWidget(cancelButton)
+        btnWdgBar.setLayout(hbox)
+        self.setCentralWidget(btnWdgBar)
+        
         self.statusBar().showMessage('Testing')
-        self.setGeometry(100, 100, 400, 250)
+        self.setGeometry(100, 100, 800, 500)
         self.setWindowTitle('OpenCouture Lite')
         self.centerUI()
 
