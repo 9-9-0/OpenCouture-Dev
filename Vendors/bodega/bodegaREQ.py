@@ -27,10 +27,11 @@ class bodegaREQ():
     def __init__(self):
         self.URL_vendor_url  = 'http://shop.bdgastore.com/'
         self.URL_direct_link = 'http://shop.bdgastore.com/collections/footwear/products/y-3-pureboost-zg'
-        self.user_size       = 8
+        self.user_size       = '8'
         self.user_session    = requests.Session()
+
     def checkItemDirect(self):
-        #NOTE: this function will most likely hamper performance but in some cases improve it, leave it up to user choice to run this before checkout
+        #NOTE: this function will most likely hamper performance but in some cases may improve it, leave it up to user choice to run this before checkout
         #Basic Steps:
         #Use BS to parse for <ul class="size options"
         #Size marked as follows: <li class="8 available" data-option-title="8"
@@ -40,25 +41,46 @@ class bodegaREQ():
         soup = BeautifulSoup(session_get.content, "lxml")
         #Check that the lxml parser works for html
         #Look to use SoupStrainer to improve parsing efficiency
-        li_list = []
         for li in soup.select('li[data-option-title]'):
-            print li
-            print
+            #print li['class']
+            #print type(li['class'])
+
+            if (self.user_size in li['class']) & ('available' in li['class']): 
+                print 'Size ' + self.user_size + ' Available'
+    
+    def addToCart(self):
+        session_get = self.user_session.get(self.URL_direct_link)
+        print 'Status of requests.get: ' + str(session_get.status_code)
+        #savePage(session_get, 'test2.html')
+
+        soup = BeautifulSoup(session_get.content, 'lxml')
+        #Check that the lxml parser works for html
+        #Look to use SoupStrainer to improve parsing efficiency
+
+        post_data = { 'id': '', 'properties[bot-key]': '' }
+
+        #Select from inside <select id="product-select"> element
+        #Find the attribute value corresponding with desired shoe size inside <option value="....">
+
+        results = soup.find_all('select', {'id':'product-select'}) 
+        foo = results[0].select('option')
+        print results
+        print
+        print foo
+
+
+
+        
+
+
 
 if __name__ == '__main__':
     instance = bodegaREQ()
     instance.checkItemDirect()
+    instance.addToCart()
 
-'''            
+'''
     def addToCart(self):
-        session_get = self.user_session.get(self.URL_direct_link)
-        print 'Status of requests.get: ' + str(session_get.status_code)
-        savePage(session_get, 'test2.html')
-
-        prod_soup = BeautifulSoup(session_get.content, "lxml")
-        #Check that the lxml parser works for html
-        #Look to use SoupStrainer to improve parsing efficiency
-        
         #Save the line below:
         ResultSet = prod_soup.find_all('form', {'id' : 'qv-form'})
     
