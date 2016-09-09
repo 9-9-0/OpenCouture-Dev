@@ -4,6 +4,7 @@
 	- Consider using Vultr and Blazing SEO to test mass executions next week
 	- Add Error Handling Functionality once the checkout process for Adidas is complete
 - 9/8 : 
+- 	- **Design Modification**: Figure out if the current OOP model supports cookie persistence between adding to cart and checking out (for example: adding to the cart may succeed on the first attempt, but it may take multiple subsequent attempts to successfully checkout)
 	- Look into python's timeit functionality to time various operations
 	- Revise the main README.md and remove MECH and SEL variants. Mechanize lacks functionality and Selenium may be too slow
 	
