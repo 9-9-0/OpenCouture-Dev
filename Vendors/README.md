@@ -1,4 +1,8 @@
 # Dev Notes
+- 9/9 : 
+	- Noticed that the headers of the get and post requests differed after inspecting them. Revised the headers and added functionality that modifies the referer key based on step in the process
+	- Consider using Vultr and Blazing SEO to test mass executions next week
+	- Add Error Handling Functionality once the checkout process for Adidas is complete
 - 9/8 : 
 	- Look into python's timeit functionality to time various operations
 	- Revise the main README.md and remove MECH and SEL variants. Mechanize lacks functionality and Selenium may be too slow
