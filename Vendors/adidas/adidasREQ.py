@@ -18,6 +18,10 @@ class adidasREQ():
         self.user_session      = requests.Session()
         self.get_headers = {}
         self.post_headers = {}
+        self.post_data_addToCart = { 'layer': 'Add To Bag overlay', 'pid': '', 'Quantity':'1', 'masterPID':'', 'ajax': 'true' }
+        #NOTE: Make quantity variable at some point?          
+        self.post_data_checkout = {}
+        #NOTE: Begin looking at fieldset class="shipping wrapper set" for all the necessary values
 
         self.importProfile()
         self.setHeaders()
@@ -55,9 +59,6 @@ class adidasREQ():
         #print self.post_headers
 
     def addToCart(self):
-        post_data = { 'layer': 'Add To Bag overlay', 'pid': '', 'Quantity':'1', 'masterPID':'', 'ajax': 'true' }
-        #NOTE: Make quantity variable at some point?          
-                      
         session_get = self.user_session.get(self.URL_product_url, headers=self.get_headers)
         #print session_get.content
         soup = BeautifulSoup(session_get.content, 'lxml')
@@ -70,34 +71,37 @@ class adidasREQ():
             #print re_result
             matchObj = re.search(r"^%s+$" % self.user_size, re_result)
             if matchObj:
-                post_data['pid'] = item['value']
-                post_data['masterPID'] = item['value'].partition("_")[0]
+                self.post_data_addToCart['pid'] = item['value']
+                self.post_data_addToCart['masterPID'] = item['value'].partition("_")[0]
                 #print post_data
 
-        session_post = self.user_session.post(url=self.URL_cart_url, headers=self.post_headers, data=post_data)
+        session_post = self.user_session.post(url=self.URL_cart_url, headers=self.post_headers, data=self.post_data_addToCart)
         print 'Add To Cart Status: ' + str(session_post.status_code)
 
     def inspectCart(self):
+        #NOTE: Optional step, however suspicion may be raised from examining the referer value (when manually adding to cart,
+        #      if the checkout is prompted from the product page, a format with a variable value is set as the referer value)
+        #      For now, this should be run to show that the cart was visited prior to checkout
         print
         self.get_headers['Referer'] = self.URL_product_url
         print self.get_headers
         session_get = self.user_session.get(url=self.URL_cart_url, headers=self.get_headers)
 
-        print 'Inspect Cart Status: ' + session_get.status_code
+        print 'Inspect Cart Status: ' + str(session_get.status_code)
         
-        #output = open('cartContents.html', 'wb')
-        #for chunk in session_get.iter_content(1000000):
-        #    output.write(chunk)
+        output = open('cartContents.html', 'wb')
+        for chunk in session_get.iter_content(1000000):
+            output.write(chunk)
 
     def checkOut(self):
-        #self.headers['Referer'] = 
-        session_get = self.user_session.get(self.URL_checkout_url, headers=self.headers)
-
+        self.get_headers['Referer'] = self.URL_cart_url
+        session_get = self.user_session.get(self.URL_checkout_url, headers=self.get_headers)
         soup = BeautifulSoup(session_get.contents, 'lxml')
 
         #output = open('checkout1.html', 'wb')
         #for chunk in session_get.iter_content(100000):
         #    output.write(chunk)
+
 
 
 
