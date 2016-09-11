@@ -20,8 +20,19 @@ class adidasREQ():
         self.post_headers = {}
         self.post_data_addToCart = { 'layer': 'Add To Bag overlay', 'pid': '', 'Quantity':'1', 'masterPID':'', 'ajax': 'true' }
         #NOTE: Make quantity variable at some point?          
-        self.post_data_checkout = {}
+        #NOTE: First three entries of post_data_checkout may change after user interaction on the webform, needs testing before sending
+        #      these values over
+        #NOTE: There's a comment about hidden data being attached to the input through app.js. I wonder if this is that hidden input field 
+        #      that comes after the fieldset tag. Might be similar to Bodega's hidden input field
+        self.post_data_checkout = { 'dwfrm_delivery_shippingOriginalAddress': 'false',
+                                    'dwfrm_delivery_shippingSuggestedAddress': 'false',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_isedited' : 'false',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_firstName': 'First Name',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_lastName': 'Last Name',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address1': 'Address Line 1'
+                                    }
         #NOTE: Begin looking at fieldset class="shipping wrapper set" for all the necessary values
+        #NOTE: IMPORTANT: self.post_data_checkout MIGHT NOT BE the data that's sent...see Dev Notes
 
         self.importProfile()
         self.setHeaders()

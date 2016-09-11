@@ -1,4 +1,7 @@
 # Dev Notes
+- 9/11 :
+	- Potential problem found with Adidas' checkout process. There are two scripts in question: id="delivery-form-config" and the script that comes after it. I'm not sure if they package up the user's inputted data and then posts it up to the server, or if it's related to a process that occurs when the user gets the checkout page.
+	- Anyhoooo, this is something to consider if the script doesn't work. Consulting an "expert" later for some advice. For now, the script will post the data with the names contained in the input fieldsets.
 - 9/9 : 
 	- Noticed that the headers of the get and post requests differed after inspecting them. Revised the headers and added functionality that modifies the referer key based on step in the process
 	- Consider using Vultr and Blazing SEO to test mass executions next week
