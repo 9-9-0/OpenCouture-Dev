@@ -22,11 +22,12 @@ dwfrm_delivery_billing_billingAddress_addressFields_phone
 dwfrm_delivery_singleshipping_shippingAddress_email_emailAddress
 dwfrm_delivery_singleshipping_shippingAddress_ageConfirmation
 
+
 dwfrm_cart_shippingMethodID_0 : 'Standard'
 shippingMethodType_0 : 'inline'
 dwfrm_cart_selectShippingMethod : 'ShippingMethodID'
 referer : 'Cart-Show'
-
+dwfrm_delivery_singleshipping_shippingAddress_agreeForSubscription
 
 
 

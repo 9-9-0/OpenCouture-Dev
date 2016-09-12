@@ -1,4 +1,6 @@
 # Dev Notes
+- 9/12 :
+	- Another potential checkout process. There's a mpstat.us post sent when you click "Review and Pay" on the shipping forms page. This may require us to look into Selenium or find a way to emulate an actual browser submitting this (with little overhead). Selenium Headless?
 - 9/11 :
 	- Potential problem found with Adidas' checkout process. There are two scripts in question: id="delivery-form-config" and the script that comes after it. I'm not sure if they package up the user's inputted data and then posts it up to the server, or if it's related to a process that occurs when the user gets the checkout page.
 	- Anyhoooo, this is something to consider if the script doesn't work. Consulting an "expert" later for some advice. For now, the script will post the data with the names contained in the input fieldsets.

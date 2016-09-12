@@ -12,6 +12,7 @@ class adidasREQ():
         self.URL_cart_url      = 'https://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/Cart-Show'
         self.URL_cart_post_url = 'http://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/Cart-MiniAddProduct'
         self.URL_checkout_url  = 'https://www.adidas.com/us/delivery-start'
+        self.URL_pay_url       = 'https://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/COSummary-Start'
         self.user_size         = '10'
         self.match_pattern     = re.compile("^%s+$" % self.user_size)
         self.sub_pattern       = re.compile("[\\n\\t]")
@@ -26,11 +27,39 @@ class adidasREQ():
         #      that comes after the fieldset tag. Might be similar to Bodega's hidden input field
         self.post_data_checkout = { 'dwfrm_delivery_shippingOriginalAddress': 'false',
                                     'dwfrm_delivery_shippingSuggestedAddress': 'false',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_isedited' : 'false',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_firstName': 'First Name',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_lastName': 'Last Name',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address1': 'Address Line 1'
-                                    }
+                                    'dwfrm_delivery_singleshipping_shippingAddress_isedited' : 'true',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_firstName': 'Bobby',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_lastName': 'McFlyMo',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address1': '1900 5th Ave',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address2': '',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_city': 'Seattle',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_countyProvince': 'WA',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_zip': '98101',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_phone': '2067281000',
+                                    'dwfrm_delivery_securekey': '',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_useAsBillingAddress': 'false',
+                                    'dwfrm_delivery_billingOriginalAddress': 'false',
+                                    'dwfrm_delivery_billingSuggestedAddress': 'false',
+                                    'dwfrm_delivery_billing_billingAddress_isedited': 'true',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_country': 'US',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_firstName': 'Bobby',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_lastName': 'McFlyMo',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_address1': '1900 5th Ave',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_address2': 'Address Line 2',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_city': 'Seattle',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_countyProvince': 'WA',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_zip': '98101',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_phone:': '2067281000',
+
+                                    'dwfrm_delivery_singleshipping_shippingAddress_email_emailAddress': 'BobbyMcFly@opencouture.io',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_ageConfirmation': 'true',
+
+                                    'dwfrm_cart_shippingMethodID_0' : 'Standard',
+                                    'shippingMethodType_0' : 'inline',
+                                    'dwfrm_cart_selectShippingMethod' : 'ShippingMethodID',
+                                    'referer' : 'Cart-Show',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_agreeForSubscription': 'false'
+                                  }
         #NOTE: Begin looking at fieldset class="shipping wrapper set" for all the necessary values
         #NOTE: IMPORTANT: self.post_data_checkout MIGHT NOT BE the data that's sent...see Dev Notes
 
@@ -70,6 +99,7 @@ class adidasREQ():
         #print self.post_headers
 
     def addToCart(self):
+        print '\nADD TO CART -----------------'
         session_get = self.user_session.get(self.URL_product_url, headers=self.get_headers)
         #print session_get.content
         soup = BeautifulSoup(session_get.content, 'lxml')
@@ -84,18 +114,19 @@ class adidasREQ():
             if matchObj:
                 self.post_data_addToCart['pid'] = item['value']
                 self.post_data_addToCart['masterPID'] = item['value'].partition("_")[0]
-                #print post_data
+                print self.post_data_addToCart
+                break
 
-        session_post = self.user_session.post(url=self.URL_cart_url, headers=self.post_headers, data=self.post_data_addToCart)
+        session_post = self.user_session.post(url=self.URL_cart_post_url, headers=self.post_headers, data=self.post_data_addToCart)
         print 'Add To Cart Status: ' + str(session_post.status_code)
 
     def inspectCart(self):
         #NOTE: Optional step, however suspicion may be raised from examining the referer value (when manually adding to cart,
         #      if the checkout is prompted from the product page, a format with a variable value is set as the referer value)
         #      For now, this should be run to show that the cart was visited prior to checkout
-        print
+        print '\nINSPECT CART ----------------'
         self.get_headers['Referer'] = self.URL_product_url
-        print self.get_headers
+        #print self.get_headers
         session_get = self.user_session.get(url=self.URL_cart_url, headers=self.get_headers)
 
         print 'Inspect Cart Status: ' + str(session_get.status_code)
@@ -104,21 +135,24 @@ class adidasREQ():
         for chunk in session_get.iter_content(1000000):
             output.write(chunk)
 
-    def checkOut(self):
+    def enterShipBill(self):
+        print '\nEntering Shipping + Billing Info -------------------'
         self.get_headers['Referer'] = self.URL_cart_url
         session_get = self.user_session.get(self.URL_checkout_url, headers=self.get_headers)
-        soup = BeautifulSoup(session_get.contents, 'lxml')
+
+        soup = BeautifulSoup(session_get.content, 'lxml')
 
         #output = open('checkout1.html', 'wb')
         #for chunk in session_get.iter_content(100000):
         #    output.write(chunk)
 
+        result = soup.findAll('input', {'name':'dwfrm_delivery_securekey'})
+        self.post_data_checkout['dwfrm_delivery+securekey'] = result[0]['value']
 
-
-
+        #print 'enterShipBill Status: ' + str(
 if __name__=='__main__':
     instance = adidasREQ()
     instance.addToCart()
     instance.inspectCart()
-    #instance.checkOut()
+    instance.enterShipBill()
 
