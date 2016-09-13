@@ -1,4 +1,8 @@
 # Dev Notes
+- 9/12 (Additional) :
+	- Created a folder with all of the headers sent during various parts of the purchase process. The headers sent by the program should reflect these state changes.
+	- Tentative, near-finalized post data for the ship/bill info written out. Saved the entire form that's sent within the HeadersForm folder
+	- Don't use BeautifulSoup.findAll if .find can be used instead. Saves some overhead
 - 9/12 :
 	- Another potential checkout process. There's a mpstat.us post sent when you click "Review and Pay" on the shipping forms page. This may require us to look into Selenium or find a way to emulate an actual browser submitting this (with little overhead). Selenium Headless?
 - 9/11 :

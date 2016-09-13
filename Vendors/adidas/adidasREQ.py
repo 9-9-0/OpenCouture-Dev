@@ -21,13 +21,9 @@ class adidasREQ():
         self.post_headers = {}
         self.post_data_addToCart = { 'layer': 'Add To Bag overlay', 'pid': '', 'Quantity':'1', 'masterPID':'', 'ajax': 'true' }
         #NOTE: Make quantity variable at some point?          
-        #NOTE: First three entries of post_data_checkout may change after user interaction on the webform, needs testing before sending
-        #      these values over
-        #NOTE: There's a comment about hidden data being attached to the input through app.js. I wonder if this is that hidden input field 
-        #      that comes after the fieldset tag. Might be similar to Bodega's hidden input field
-        self.post_data_checkout = { 'dwfrm_delivery_shippingOriginalAddress': 'false',
+        self.post_data_custInfo = { 'dwfrm_delivery_shippingOriginalAddress': 'false',
                                     'dwfrm_delivery_shippingSuggestedAddress': 'false',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_isedited' : 'true',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_isedited' : 'false',
                                     'dwfrm_delivery_singleshipping_shippingAddress_addressFields_firstName': 'Bobby',
                                     'dwfrm_delivery_singleshipping_shippingAddress_addressFields_lastName': 'McFlyMo',
                                     'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address1': '1900 5th Ave',
@@ -36,11 +32,12 @@ class adidasREQ():
                                     'dwfrm_delivery_singleshipping_shippingAddress_addressFields_countyProvince': 'WA',
                                     'dwfrm_delivery_singleshipping_shippingAddress_addressFields_zip': '98101',
                                     'dwfrm_delivery_singleshipping_shippingAddress_addressFields_phone': '2067281000',
+                                    'state': '',
                                     'dwfrm_delivery_securekey': '',
                                     'dwfrm_delivery_singleshipping_shippingAddress_useAsBillingAddress': 'false',
                                     'dwfrm_delivery_billingOriginalAddress': 'false',
                                     'dwfrm_delivery_billingSuggestedAddress': 'false',
-                                    'dwfrm_delivery_billing_billingAddress_isedited': 'true',
+                                    'dwfrm_delivery_billing_billingAddress_isedited': 'false',
                                     'dwfrm_delivery_billing_billingAddress_addressFields_country': 'US',
                                     'dwfrm_delivery_billing_billingAddress_addressFields_firstName': 'Bobby',
                                     'dwfrm_delivery_billing_billingAddress_addressFields_lastName': 'McFlyMo',
@@ -50,18 +47,23 @@ class adidasREQ():
                                     'dwfrm_delivery_billing_billingAddress_addressFields_countyProvince': 'WA',
                                     'dwfrm_delivery_billing_billingAddress_addressFields_zip': '98101',
                                     'dwfrm_delivery_billing_billingAddress_addressFields_phone:': '2067281000',
+                                    #'state': '',
 
                                     'dwfrm_delivery_singleshipping_shippingAddress_email_emailAddress': 'BobbyMcFly@opencouture.io',
                                     'dwfrm_delivery_singleshipping_shippingAddress_ageConfirmation': 'true',
-
+                                    'signup_source': 'shipping',
+                                    
                                     'dwfrm_cart_shippingMethodID_0' : 'Standard',
                                     'shippingMethodType_0' : 'inline',
                                     'dwfrm_cart_selectShippingMethod' : 'ShippingMethodID',
                                     'referer' : 'Cart-Show',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_agreeForSubscription': 'false'
+                                    'dwfrm_delivery_singleshipping_shippingAddress_agreeForSubscription': 'false',
+                                    'dwfrm_delivery_savedelivery': 'Review and Pay',
+                                    'format': 'ajax'
                                   }
         #NOTE: Begin looking at fieldset class="shipping wrapper set" for all the necessary values
-        #NOTE: IMPORTANT: self.post_data_checkout MIGHT NOT BE the data that's sent...see Dev Notes
+        #NOTE: IMPORTANT: self.post_data_custInfo MIGHT NOT BE the data that's sent...see Dev Notes
+        #NOTE: Checked the posted form, current self.post_data_custInfo should be all that's posted
 
         self.importProfile()
         self.setHeaders()
@@ -137,8 +139,18 @@ class adidasREQ():
 
     def enterShipBill(self):
         print '\nEntering Shipping + Billing Info -------------------'
+        
+        #Modify Headers
         self.get_headers['Referer'] = self.URL_cart_url
+        self.post_headers['Accept'] = 'text/html, */*; q=0.01'
+        self.post_headers['Accept-Encoding'] = ['gzip', 'deflate', 'br']
+        self.post_headers['Content-Length'] = '2088'
+        self.post_headers['Referer'] = 'Placeholder'
+        #NOTE: Referer gets set to a variable value: https://www.adidas.com/us/delivery-start?pid_0=BB5480_650&qty_0=1&basketKey=81b3aa32a17404d47328bc61a31f1911
+        #Need to find basketkey and format that into a url
+
         session_get = self.user_session.get(self.URL_checkout_url, headers=self.get_headers)
+
 
         soup = BeautifulSoup(session_get.content, 'lxml')
 
@@ -146,10 +158,20 @@ class adidasREQ():
         #for chunk in session_get.iter_content(100000):
         #    output.write(chunk)
 
-        result = soup.findAll('input', {'name':'dwfrm_delivery_securekey'})
-        self.post_data_checkout['dwfrm_delivery+securekey'] = result[0]['value']
+        result = soup.find('input', {'name':'dwfrm_delivery_securekey'})
+        self.post_data_custInfo['dwfrm_delivery+securekey'] = result['value']
+        print self.post_data_custInfo['dwfrm_delivery+securekey']
+
+        result = soup.find('meta', {'property': 'og:url'})
+        print result['content']
+
+
+
+        #Post URL: https://www.adidas.com/us/delivery-start?dwcont=C1101547493 
+        #Variable dwcont value, find this variable
 
         #print 'enterShipBill Status: ' + str(
+
 if __name__=='__main__':
     instance = adidasREQ()
     instance.addToCart()
