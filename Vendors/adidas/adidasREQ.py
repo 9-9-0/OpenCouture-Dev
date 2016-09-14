@@ -1,6 +1,8 @@
 import requests
 import re
 from bs4 import BeautifulSoup
+import time
+import json
 
 #Vendor Specific NOTES: 
 #Use chrome if you're going to emulate browser automation as the javascript lags with default Firefox
@@ -12,7 +14,7 @@ def savePage(response, filename, rate=100000):
 
 class adidasREQ():
     def __init__(self):
-        self.URL_vendor_url    = 'http://www.adidas.com/us/men-originals-shoes' #NOTE: Newest releases may not show with sort options
+        self.URL_home_url      = 'http://www.adidas.com/us/men-shoes' #NOTE: Newest releases may not show with sort options
         self.URL_product_url   = 'http://www.adidas.com/us/superstar-triple-shoes/BB3695.html'
         self.URL_cart_url      = 'https://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/Cart-Show'
         self.URL_cart_post_url = 'http://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/Cart-MiniAddProduct'
@@ -26,44 +28,42 @@ class adidasREQ():
         self.get_headers = {}
         self.post_headers = {}
         self.post_data_addToCart = { 'layer': 'Add To Bag overlay', 'pid': '', 'Quantity':'1', 'masterPID':'', 'ajax': 'true' }
-        #NOTE: Make quantity variable at some point?          
+        #NOTE: Make quantity variable at some point?
         self.post_data_custInfo = { 'dwfrm_delivery_shippingOriginalAddress': 'false',
                                     'dwfrm_delivery_shippingSuggestedAddress': 'false',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_isedited' : 'false',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_firstName': 'Bobby',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_lastName': 'McFlyMo',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address1': '1900 5th Ave',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_isedited': 'false',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_firstName': 'Bobb',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_lastName': 'McFlymo',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address1': '1000 5th Ave',
                                     'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address2': '',
                                     'dwfrm_delivery_singleshipping_shippingAddress_addressFields_city': 'Seattle',
                                     'dwfrm_delivery_singleshipping_shippingAddress_addressFields_countyProvince': 'WA',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_zip': '98101',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_phone': '2067281000',
                                     'state': '',
-                                    'dwfrm_delivery_securekey': '',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_zip': '98101',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_addressFields_phone': '2029001930',
                                     'dwfrm_delivery_singleshipping_shippingAddress_useAsBillingAddress': 'false',
+                                    'dwfrm_delivery_securekey': '',
                                     'dwfrm_delivery_billingOriginalAddress': 'false',
                                     'dwfrm_delivery_billingSuggestedAddress': 'false',
                                     'dwfrm_delivery_billing_billingAddress_isedited': 'false',
                                     'dwfrm_delivery_billing_billingAddress_addressFields_country': 'US',
-                                    'dwfrm_delivery_billing_billingAddress_addressFields_firstName': 'Bobby',
-                                    'dwfrm_delivery_billing_billingAddress_addressFields_lastName': 'McFlyMo',
-                                    'dwfrm_delivery_billing_billingAddress_addressFields_address1': '1900 5th Ave',
-                                    'dwfrm_delivery_billing_billingAddress_addressFields_address2': 'Address Line 2',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_firstName': 'Bobb',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_lastName': 'McFlymo',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_address1': '1000 5th Ave',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_address2': '',
                                     'dwfrm_delivery_billing_billingAddress_addressFields_city': 'Seattle',
                                     'dwfrm_delivery_billing_billingAddress_addressFields_countyProvince': 'WA',
                                     'dwfrm_delivery_billing_billingAddress_addressFields_zip': '98101',
-                                    'dwfrm_delivery_billing_billingAddress_addressFields_phone:': '2067281000',
-                                    #'state': '',
-
-                                    'dwfrm_delivery_singleshipping_shippingAddress_email_emailAddress': 'BobbyMcFly@opencouture.io',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_ageConfirmation': 'true',
+                                    'dwfrm_delivery_billing_billingAddress_addressFields_phone': '2029001930',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_email_emailAddress': 'asfsaf@gmail.com',
                                     'signup_source': 'shipping',
-                                    
-                                    'dwfrm_cart_shippingMethodID_0' : 'Standard',
-                                    'shippingMethodType_0' : 'inline',
-                                    'dwfrm_cart_selectShippingMethod' : 'ShippingMethodID',
-                                    'referer' : 'Cart-Show',
-                                    'dwfrm_delivery_singleshipping_shippingAddress_agreeForSubscription': 'false',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_ageConfirmation': 'true',
+                                    'shipping-group-0': 'Standard',
+                                    'dwfrm_cart_shippingMethodID_0': 'Standard',
+                                    'shippingMethodType_0': 'inline',
+                                    'dwfrm_cart_selectShippingMethod': 'ShippingMethodID',
+                                    'referer': 'Cart-Show',
+                                    'dwfrm_delivery_singleshipping_shippingAddress_agreeForSubscription': 'true',
                                     'dwfrm_delivery_savedelivery': 'Review and Pay',
                                     'format': 'ajax'
                                   }
@@ -83,7 +83,7 @@ class adidasREQ():
                              'Accept-Language': 'en-US, en;q=0.8',
                              'Connection': 'keep-alive',
                              'Host': 'www.adidas.com',
-                             'Referer': self.URL_vendor_url,
+                             'Referer': self.URL_home_url,
                              'Upgrade-Insecure-Requests': '1',
                              'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.92 Safari/537.36'}
         #print self.get_headers
@@ -139,7 +139,7 @@ class adidasREQ():
 
         print 'Inspect Cart Status: ' + str(session_get.status_code)
         
-        savePage(session_get, 'cartContents.html')
+        #savePage(session_get, 'cartContents.html')
 
     def enterShipBill(self):
         print '\nEntering Shipping + Billing Info -------------------'
@@ -148,22 +148,29 @@ class adidasREQ():
         self.get_headers['Referer'] = self.URL_cart_url
         self.post_headers['Accept'] = 'text/html, */*; q=0.01'
         self.post_headers['Accept-Encoding'] = 'gzip, deflate, br'
-        self.post_headers['Content-Length'] = '2500' #May get rid of this, seems to respond to length of data posted possibly sets a limit
-        self.post_headers['Referer'] = self.URL_pay_url
+        #self.post_headers['Content-Length'] = '2500' #May get rid of this, seems to respond to length of data posted possibly sets a limit
+        self.post_headers.pop('Content-Length')
+        self.post_headers['Referer'] = self.URL_checkout_url
         #NOTE: self.URL_pay_url is the correct referer value if done from a clean session
         #result = soup.find('meta', {'property': 'og:url'})
-        #Future reference: the basket key is stored in cookies 
+        #Future reference: the basket key is stored in cookies
+        #print 'enterShipBill GET HEADERS'
+        #print json.dumps(self.get_headers, indent=1)
 
         session_get = self.user_session.get(self.URL_checkout_url, headers=self.get_headers)
         #savePage(session_get, 'ShipBillPage.html')
 
         soup = BeautifulSoup(session_get.content, 'lxml')
         result = soup.find('input', {'name':'dwfrm_delivery_securekey'})
-        self.post_data_custInfo['dwfrm_delivery+securekey'] = result['value']
-        #print self.post_data_custInfo['dwfrm_delivery+securekey']
+        self.post_data_custInfo['dwfrm_delivery_securekey'] = result['value']
         result = soup.find('form', class_='formcheckout') 
         self.URL_post_SB_url = result['action']
-        
+        #print self.URL_post_SB_url
+        #print 'enterShipBill POST HEADERS'
+        #print json.dumps(self.post_headers, indent=1)
+        #print 'enterShipBill POST DATA'
+        #print json.dumps(self.post_data_custInfo, indent=1)
+
         session_post = self.user_session.post(url=self.URL_post_SB_url, headers=self.post_headers, data=self.post_data_custInfo)
 
         print 'enterShipBill Status: ' + str(session_post.status_code)
@@ -171,6 +178,7 @@ class adidasREQ():
     def finalBoss(self):
         print '\nEntering Payment Info -----------------------------'
         self.get_headers['Referer'] = self.URL_checkout_url
+        #print json.dumps(self.get_headers, indent=1)
         session_get = self.user_session.get(self.URL_pay_url, headers=self.get_headers)
         
 
@@ -178,9 +186,11 @@ class adidasREQ():
 
 
 if __name__=='__main__':
+    start_time = time.time()
     instance = adidasREQ()
     instance.addToCart()
     instance.inspectCart()
     instance.enterShipBill()
     instance.finalBoss()
+    print("%s seconds" % (time.time() - start_time))
 
