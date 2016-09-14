@@ -1,4 +1,8 @@
 # Dev Notes
+- 9/13 :
+	- More problems: Adidas has implemented a 10 minute checkout + Captcha on certain exclusive items (https://www.adidas.com/us/eqt-support-93-16-shoes/S79921.html)
+	- Check DeathByCaptcha and see if their paid API is worth implementing
+	- Code Issues: Shipping and Billing info gets posted, but subsequent retrieval of payment information page redirects to where delivery-start directs to. Find out what's going on
 - 9/12 (Additional) :
 	- Created a folder with all of the headers sent during various parts of the purchase process. The headers sent by the program should reflect these state changes.
 	- Tentative, near-finalized post data for the ship/bill info written out. Saved the entire form that's sent within the HeadersForm folder

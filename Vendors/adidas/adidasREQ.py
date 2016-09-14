@@ -5,6 +5,11 @@ from bs4 import BeautifulSoup
 #Vendor Specific NOTES: 
 #Use chrome if you're going to emulate browser automation as the javascript lags with default Firefox
 
+def savePage(response, filename, rate=100000):
+    output = open(filename, 'wb')
+    for chunk in response.iter_content(rate):
+        output.write(chunk)
+
 class adidasREQ():
     def __init__(self):
         self.URL_vendor_url    = 'http://www.adidas.com/us/men-originals-shoes' #NOTE: Newest releases may not show with sort options
@@ -12,6 +17,7 @@ class adidasREQ():
         self.URL_cart_url      = 'https://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/Cart-Show'
         self.URL_cart_post_url = 'http://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/Cart-MiniAddProduct'
         self.URL_checkout_url  = 'https://www.adidas.com/us/delivery-start'
+        self.URL_post_SB_url   = ''
         self.URL_pay_url       = 'https://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/COSummary-Start'
         self.user_size         = '10'
         self.match_pattern     = re.compile("^%s+$" % self.user_size)
@@ -72,10 +78,9 @@ class adidasREQ():
         print 'ayy bae diz iz importProfile() placeholder'
 
     def setHeaders(self):
-        self.get_headers = { 'Accept': ['text/html', 'application/xhtml+xml', 'application/xml;q=0.9', 'image/webp', '*/*;q=0.8'],
-                             'Accept-Encoding': ['gzip', 'deflate', 'sdch'],
-                             'Accept-Language': ['en-US', 'en;q=0.8'],
-                             'Cache-Control': 'max-age=0',
+        self.get_headers = { 'Accept': 'text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8',
+                             'Accept-Encoding': 'gzip, deflate, sdch',
+                             'Accept-Language': 'en-US, en;q=0.8',
                              'Connection': 'keep-alive',
                              'Host': 'www.adidas.com',
                              'Referer': self.URL_vendor_url,
@@ -88,8 +93,8 @@ class adidasREQ():
         #NOTE: Referer needs to be updated with each step of the process or you might be banned
 
         self.post_headers = { 'Accept': '*/*',
-                              'Accept-Encoding': ['gzip', 'deflate'],
-                              'Accept-Language': ['en-US', 'en;q=0.8'],
+                              'Accept-Encoding': 'gzip, deflate',
+                              'Accept-Language': 'en-US, en;q=0.8',
                               'Connection': 'keep-alive',
                               'Content-Length': '77',
                               'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -127,15 +132,14 @@ class adidasREQ():
         #      if the checkout is prompted from the product page, a format with a variable value is set as the referer value)
         #      For now, this should be run to show that the cart was visited prior to checkout
         print '\nINSPECT CART ----------------'
+        self.get_headers['Accept-Encoding'] = 'gzip, deflate, sdch, br'
         self.get_headers['Referer'] = self.URL_product_url
         #print self.get_headers
         session_get = self.user_session.get(url=self.URL_cart_url, headers=self.get_headers)
 
         print 'Inspect Cart Status: ' + str(session_get.status_code)
         
-        output = open('cartContents.html', 'wb')
-        for chunk in session_get.iter_content(1000000):
-            output.write(chunk)
+        savePage(session_get, 'cartContents.html')
 
     def enterShipBill(self):
         print '\nEntering Shipping + Billing Info -------------------'
@@ -143,38 +147,40 @@ class adidasREQ():
         #Modify Headers
         self.get_headers['Referer'] = self.URL_cart_url
         self.post_headers['Accept'] = 'text/html, */*; q=0.01'
-        self.post_headers['Accept-Encoding'] = ['gzip', 'deflate', 'br']
-        self.post_headers['Content-Length'] = '2088'
-        self.post_headers['Referer'] = 'Placeholder'
-        #NOTE: Referer gets set to a variable value: https://www.adidas.com/us/delivery-start?pid_0=BB5480_650&qty_0=1&basketKey=81b3aa32a17404d47328bc61a31f1911
-        #Need to find basketkey and format that into a url
+        self.post_headers['Accept-Encoding'] = 'gzip, deflate, br'
+        self.post_headers['Content-Length'] = '2500' #May get rid of this, seems to respond to length of data posted possibly sets a limit
+        self.post_headers['Referer'] = self.URL_pay_url
+        #NOTE: self.URL_pay_url is the correct referer value if done from a clean session
+        #result = soup.find('meta', {'property': 'og:url'})
+        #Future reference: the basket key is stored in cookies 
 
         session_get = self.user_session.get(self.URL_checkout_url, headers=self.get_headers)
-
+        #savePage(session_get, 'ShipBillPage.html')
 
         soup = BeautifulSoup(session_get.content, 'lxml')
-
-        #output = open('checkout1.html', 'wb')
-        #for chunk in session_get.iter_content(100000):
-        #    output.write(chunk)
-
         result = soup.find('input', {'name':'dwfrm_delivery_securekey'})
         self.post_data_custInfo['dwfrm_delivery+securekey'] = result['value']
-        print self.post_data_custInfo['dwfrm_delivery+securekey']
+        #print self.post_data_custInfo['dwfrm_delivery+securekey']
+        result = soup.find('form', class_='formcheckout') 
+        self.URL_post_SB_url = result['action']
+        
+        session_post = self.user_session.post(url=self.URL_post_SB_url, headers=self.post_headers, data=self.post_data_custInfo)
 
-        result = soup.find('meta', {'property': 'og:url'})
-        print result['content']
+        print 'enterShipBill Status: ' + str(session_post.status_code)
 
+    def finalBoss(self):
+        print '\nEntering Payment Info -----------------------------'
+        self.get_headers['Referer'] = self.URL_checkout_url
+        session_get = self.user_session.get(self.URL_pay_url, headers=self.get_headers)
+        
 
+        savePage(session_get, 'finalCheckout.html')
 
-        #Post URL: https://www.adidas.com/us/delivery-start?dwcont=C1101547493 
-        #Variable dwcont value, find this variable
-
-        #print 'enterShipBill Status: ' + str(
 
 if __name__=='__main__':
     instance = adidasREQ()
     instance.addToCart()
     instance.inspectCart()
     instance.enterShipBill()
+    instance.finalBoss()
 
