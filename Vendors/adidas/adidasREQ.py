@@ -29,6 +29,8 @@ class adidasREQ():
         self.post_headers = {}
         self.post_data_addToCart = { 'layer': 'Add To Bag overlay', 'pid': '', 'Quantity':'1', 'masterPID':'', 'ajax': 'true' }
         #NOTE: Make quantity variable at some point?
+        #NOTE: Begin looking at fieldset class="shipping wrapper set" for all the necessary values
+	#NOTE: Use '2ndDay' as 2 Day delivery
         self.post_data_custInfo = { 'dwfrm_delivery_shippingOriginalAddress': 'false',
                                     'dwfrm_delivery_shippingSuggestedAddress': 'false',
                                     'dwfrm_delivery_singleshipping_shippingAddress_isedited': 'false',
@@ -67,7 +69,6 @@ class adidasREQ():
                                     'dwfrm_delivery_savedelivery': 'Review and Pay',
                                     'format': 'ajax'
                                   }
-        #NOTE: Begin looking at fieldset class="shipping wrapper set" for all the necessary values
         #NOTE: IMPORTANT: self.post_data_custInfo MIGHT NOT BE the data that's sent...see Dev Notes
         #NOTE: Checked the posted form, current self.post_data_custInfo should be all that's posted
 
@@ -143,6 +144,46 @@ class adidasREQ():
 
     def enterShipBill(self):
         print '\nEntering Shipping + Billing Info -------------------'
+        #NOTE: this still isn't working...
+        post_data_custInfo = {  'dwfrm_delivery_shippingOriginalAddress':'false',
+                                'dwfrm_delivery_shippingSuggestedAddress':'false',
+                                'dwfrm_delivery_singleshipping_shippingAddress_isedited':'false',
+                                'dwfrm_delivery_singleshipping_shippingAddress_addressFields_firstName':'Bob',
+                                'dwfrm_delivery_singleshipping_shippingAddress_addressFields_lastName':'McFlymo',
+                                'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address1':'2939 5th Ave',
+                                'dwfrm_delivery_singleshipping_shippingAddress_addressFields_address2':'',
+                                'dwfrm_delivery_singleshipping_shippingAddress_addressFields_city':'Chesterfield',
+                                'dwfrm_delivery_singleshipping_shippingAddress_addressFields_countyProvince':'WA',
+                                'state':'',
+                                'dwfrm_delivery_singleshipping_shippingAddress_addressFields_zip':'98101',
+                                'dwfrm_delivery_singleshipping_shippingAddress_addressFields_phone':'2029001930',
+                                'dwfrm_delivery_singleshipping_shippingAddress_useAsBillingAddress':'true',
+                                'dwfrm_delivery_securekey':'1827051510',
+                                'dwfrm_delivery_billingOriginalAddress':'false',
+                                'dwfrm_delivery_billingSuggestedAddress':'false',
+                                'dwfrm_delivery_billing_billingAddress_isedited':'false',
+                                'dwfrm_delivery_billing_billingAddress_addressFields_country':'US',
+                                'dwfrm_delivery_billing_billingAddress_addressFields_firstName':'Bob',
+                                'dwfrm_delivery_billing_billingAddress_addressFields_lastName':'McFlymo',
+                                'dwfrm_delivery_billing_billingAddress_addressFields_address1':'2939 5th Ave',
+                                'dwfrm_delivery_billing_billingAddress_addressFields_address2':'',
+                                'dwfrm_delivery_billing_billingAddress_addressFields_city':'Chesterfield',
+                                'dwfrm_delivery_billing_billingAddress_addressFields_countyProvince':'WA',
+                                #'state':'',
+                                'dwfrm_delivery_billing_billingAddress_addressFields_zip':'98101',
+                                'dwfrm_delivery_billing_billingAddress_addressFields_phone':'2029001930',
+                                'dwfrm_delivery_singleshipping_shippingAddress_email_emailAddress':'asfsaf@gmail.com',
+                                'signup_source':'shipping',
+                                'dwfrm_delivery_singleshipping_shippingAddress_ageConfirmation':'true',
+                                'shipping-group-0':'2ndDay',
+                                'dwfrm_cart_shippingMethodID_0':'2ndDay',
+                                'shippingMethodType_0':'inline',
+                                'dwfrm_cart_selectShippingMethod':'ShippingMethodID',
+                                'referer':'Cart-Show',
+                                'dwfrm_delivery_singleshipping_shippingAddress_agreeForSubscription':'true',
+                                'dwfrm_delivery_savedelivery':'Review and Pay',
+                                'format':'ajax'
+                             }
         
         #Modify Headers
         self.get_headers['Referer'] = self.URL_cart_url
@@ -151,7 +192,6 @@ class adidasREQ():
         #self.post_headers['Content-Length'] = '2500' #May get rid of this, seems to respond to length of data posted possibly sets a limit
         self.post_headers.pop('Content-Length')
         self.post_headers['Referer'] = self.URL_checkout_url
-        #NOTE: self.URL_pay_url is the correct referer value if done from a clean session
         #result = soup.find('meta', {'property': 'og:url'})
         #Future reference: the basket key is stored in cookies
         #print 'enterShipBill GET HEADERS'
@@ -162,6 +202,7 @@ class adidasREQ():
 
         soup = BeautifulSoup(session_get.content, 'lxml')
         result = soup.find('input', {'name':'dwfrm_delivery_securekey'})
+        print result
         self.post_data_custInfo['dwfrm_delivery_securekey'] = result['value']
         result = soup.find('form', class_='formcheckout') 
         self.URL_post_SB_url = result['action']
@@ -170,20 +211,42 @@ class adidasREQ():
         #print json.dumps(self.post_headers, indent=1)
         #print 'enterShipBill POST DATA'
         #print json.dumps(self.post_data_custInfo, indent=1)
-
+        
         session_post = self.user_session.post(url=self.URL_post_SB_url, headers=self.post_headers, data=self.post_data_custInfo)
 
         print 'enterShipBill Status: ' + str(session_post.status_code)
 
+        self.get_headers['Referer'] = self.URL_checkout_url
+        self.post_headers['Referer'] = self.URL_pay_url
+        #print json.dumps(self.get_headers, indent=1)
+        session_get = self.user_session.get(self.URL_pay_url, headers=self.get_headers)
+        savePage(session_get, 'finalCheckout.html')
+
     def finalBoss(self):
         print '\nEntering Payment Info -----------------------------'
         self.get_headers['Referer'] = self.URL_checkout_url
+        self.post_headers['Referer'] = self.URL_pay_url
         #print json.dumps(self.get_headers, indent=1)
         session_get = self.user_session.get(self.URL_pay_url, headers=self.get_headers)
-        
-
         savePage(session_get, 'finalCheckout.html')
+        soup = BeautifulSoup(session_get.content, 'lxml')
+	pay_secure_key = soup.find('input', {'name':'dwfrm_payment_securekey'})
+        print pay_secure_key
 
+
+        #NOTE: Visa, Mastercard, etc...correspond to different types. Find how they get set
+        #NOTE: Visa = 001, Mastercard = 002, AE = 003, Discover = 004
+        post_data_payInfo = { 'dwfrm_payment_creditCard_type': '002',
+                              'dwfrm_payment_creditCard_owner': 'Bob McFlymo',
+                              'dwfrm_payment_creditCard_number': '5105105105105100',
+                              'dwfrm_payment_creditCard_month': '01',
+                              'dwfrm_payment_creditCard_year': '2018',
+                              'dwfrm_payment_creditCard_cvn': '002',
+                              'dwfrm_payment_securekey': pay_secure_key,
+                              'dwfrm_payment_signcreditcardfields': 'sign'
+                             }
+        
+        #savePage(session_get, 'finalCheckout.html')
 
 if __name__=='__main__':
     start_time = time.time()

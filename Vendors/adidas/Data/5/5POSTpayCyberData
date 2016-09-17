@@ -1,0 +1,62 @@
+access_key:35a32d14bbef3659a0fa99b9e79df402
+amount:279.80
+bill_to_address_city:
+bill_to_address_country:US
+bill_to_address_line1:
+bill_to_email:asfsaf@gmail.com
+bill_to_forename:Bob
+bill_to_surname:McFlymo
+card_expiry_date:01-2018
+card_type:002
+currency:USD
+locale:en-us
+payment_method:card
+profile_id:0AD01033-33D9-4D2D-A9A4-E4E400EBF67A
+reference_number:A008694813
+signed_date_time:2016-09-14T15:15:59Z
+transaction_uuid:534beba818c792fed7849a3fba
+transaction_type:authorization
+unsigned_field_names:card_number,card_cvn
+override_custom_receipt_page:https://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/COSummary-Start/C1152480416
+bill_to_phone:2029001930
+bill_to_address_state:MO
+bill_to_address_postal_code:63121
+device_fingerprint_id:A008694813
+customer_ip_address:134.124.189.145
+merchant_defined_data1:Web
+merchant_defined_data2:adidas
+merchant_defined_data4:null
+merchant_defined_data6:4-7 day delivery
+merchant_defined_data7:A008694813
+ship_to_address_city:
+ship_to_address_country:
+ship_to_address_line1:
+ship_to_address_postal_code:
+ship_to_address_state:MO
+ship_to_forename:Bob
+ship_to_phone:2029001930
+ship_to_surname:McFlymo
+item_0_quantity:1
+item_0_unit_price:180
+item_0_code:default
+item_0_name:Ultra Boost Shoes
+item_0_sku:BB3909
+item_0_tax_amount:13.71
+item_1_quantity:1
+item_1_unit_price:80
+item_1_code:default
+item_1_name:Superstar Shoes
+item_1_sku:AF5666
+item_1_tax_amount:6.09
+item_2_quantity:1
+item_2_unit_price:0
+item_2_code:shipping_and_handling
+item_2_name:4-7 day delivery
+item_2_sku:Shipping and Handling
+item_2_tax_amount:0
+tax_amount:19.80
+line_item_count:3
+signed_field_names:access_key,amount,bill_to_address_city,bill_to_address_country,bill_to_address_line1,bill_to_email,bill_to_forename,bill_to_surname,card_expiry_date,card_type,currency,locale,payment_method,profile_id,reference_number,signed_date_time,transaction_uuid,transaction_type,unsigned_field_names,override_custom_receipt_page,bill_to_phone,bill_to_address_state,bill_to_address_postal_code,device_fingerprint_id,customer_ip_address,merchant_defined_data1,merchant_defined_data2,merchant_defined_data4,merchant_defined_data6,merchant_defined_data7,ship_to_address_city,ship_to_address_country,ship_to_address_line1,ship_to_address_postal_code,ship_to_address_state,ship_to_forename,ship_to_phone,ship_to_surname,item_0_quantity,item_0_unit_price,item_0_code,item_0_name,item_0_sku,item_0_tax_amount,item_1_quantity,item_1_unit_price,item_1_code,item_1_name,item_1_sku,item_1_tax_amount,item_2_quantity,item_2_unit_price,item_2_code,item_2_name,item_2_sku,item_2_tax_amount,tax_amount,line_item_count,signed_field_names
+signature:JUAE2diB1P0m8waEOzNl32fBfl5K280nxinQku5nrHY=
+card_cvn:002
+card_number:5105105105105100

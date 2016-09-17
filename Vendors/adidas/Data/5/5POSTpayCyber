@@ -1,0 +1,13 @@
+Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Encoding:gzip, deflate, br
+Accept-Language:en-US,en;q=0.8
+Cache-Control:max-age=0
+Connection:keep-alive
+Content-Length:2923
+Content-Type:application/x-www-form-urlencoded
+Cookie:UnicaNIODID=Enu2pnJlDx0-Z6t1kPE; CYBSGUID=e6c113ec-5c4b-0a6a-f1a5-2e338087c215; elqQs=%2C%2C%2C%2Chttp%3A%2F%2Fwww.cybersource.com%2F; _ga=GA1.2.1840180942.1473819300; __utma=80760392.1840180942.1473819300.1473819300.1473819300.1; __utmz=80760392.1473819300.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmv=80760392.|1=Industry=Education=1^2=RevenueRange=%24100M%20-%20%24250M=1^4=CompanyName=University%20of%20Missouri%20St%20Louis=1
+Host:secureacceptance.cybersource.com
+Origin:https://www.adidas.com
+Referer:https://www.adidas.com/on/demandware.store/Sites-adidas-US-Site/en_US/COSummary-Start
+Upgrade-Insecure-Requests:1
+User-Agent:Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.92 Safari/537.36

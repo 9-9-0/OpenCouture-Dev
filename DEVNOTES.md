@@ -1,4 +1,11 @@
 # Dev Notes
+- 9/17 :
+	- Big obstacle: the data that's inputted into the forms on the checkout page gets packaged and sent to cybersource for payment processing. Having trouble finding which script does this. Included a relevant one in /Vendors/adidas/Data/5/cybersource.js 
+	- If this part of the step can't be fully automated, might have to resort to importing cookies into a selenium web driver and opening up the page from there. And of course, there hasn't been effort on figuring out why that didn't work in the first place...
+- 9/14 :
+	- Find ways to optimize what we have so far. 3.3 seconds on average seems a bit much. Gets hung up on the enterShipBill() method, perhaps there's a lot of overhead in retrieving the dictionary 
+by reference...
+	- Tested a run with the custInfo dictionary within scope of instance function and ran .5 seconds faster on average. How do I maintain OOP functionality while leaving data within their respective functions? Perhaps macros?
 - 9/13 :
 	- More problems: Adidas has implemented a 10 minute checkout + Captcha on certain exclusive items (https://www.adidas.com/us/eqt-support-93-16-shoes/S79921.html)
 	- Check DeathByCaptcha and see if their paid API is worth implementing
