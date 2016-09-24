@@ -3,14 +3,15 @@ import re
 from bs4 import BeautifulSoup
 import time
 import json
+from selenium import webdriver
 
 #Vendor Specific NOTES: 
 #Use chrome if you're going to emulate browser automation as the javascript lags with default Firefox
 
 def savePage(response, filename, rate=100000):
-    output = open(filename, 'wb')
-    for chunk in response.iter_content(rate):
-        output.write(chunk)
+    with open(filename, 'wb') as output:
+        for chunk in response.iter_content(rate):
+            output.write(chunk)
 
 class adidasREQ():
     def __init__(self):
@@ -247,13 +248,36 @@ class adidasREQ():
                              }
         
         #savePage(session_get, 'finalCheckout.html')
+    
+    def finalBossSEL(self):
+        driver = webdriver.Firefox()
+        driver.get(self.URL_pay_url)
+        driver.add_cookie(self.user_session.cookies)
+
+    def inspectCart2(self):
+        print '\nINSPECT CART ----------------'
+        self.get_headers['Accept-Encoding'] = 'gzip, deflate, sdch, br'
+        self.get_headers['Referer'] = self.URL_product_url
+        session_get = self.user_session.get(url=self.URL_cart_url, headers=self.get_headers)
+
+        print 'Inspect Cart Status: ' + str(session_get.status_code)
+        
+        cookies = self.user_session.cookies.get_dict()
+        with open('injectCookies', 'wb') as output:
+            output.write(json.dumps(cookies, indent=1))
+
+        driver = webdriver.Firefox()
+        driver.get(self.URL_cart_url)
+        driver.add_cookie(cookies)
+        driver.get(self.URL_cart_url)
 
 if __name__=='__main__':
     start_time = time.time()
     instance = adidasREQ()
     instance.addToCart()
-    instance.inspectCart()
-    instance.enterShipBill()
-    instance.finalBoss()
+    instance.inspectCart2()
+    #instance.enterShipBill()
+    #instance.finalBoss()
+    #instance.finalBossSEL()
     print("%s seconds" % (time.time() - start_time))
 

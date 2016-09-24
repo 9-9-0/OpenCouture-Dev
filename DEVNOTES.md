@@ -1,4 +1,7 @@
 # Dev Notes
+- 9/23 :
+	- Moving away from requests and bs4 library. Selenium Headless definitely seems like a better choice when it comes to pressing buttons and having scripts execute (should work with adidas when completed)
+	- Building the script for bodega first, already running into issues. See issues.
 - 9/17 :
 	- Big obstacle: the data that's inputted into the forms on the checkout page gets packaged and sent to cybersource for payment processing. Having trouble finding which script does this. Included a relevant one in /Vendors/adidas/Data/5/cybersource.js 
 	- If this part of the step can't be fully automated, might have to resort to importing cookies into a selenium web driver and opening up the page from there. And of course, there hasn't been effort on figuring out why that didn't work in the first place...
