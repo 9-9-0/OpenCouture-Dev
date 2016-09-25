@@ -1,4 +1,7 @@
 # Dev Notes
+- 9/25 :
+	- Finished up the prototype for bodegaSEL.py. Works...almost. Damn third party payment solution providers...
+	- Figure out how to load CC info into that shopify payment box. Doesn't work like traditional input fields. 
 - 9/23 :
 	- Moving away from requests and bs4 library. Selenium Headless definitely seems like a better choice when it comes to pressing buttons and having scripts execute (should work with adidas when completed)
 	- Building the script for bodega first, already running into issues. See issues.
