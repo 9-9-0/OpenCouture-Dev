@@ -16,6 +16,22 @@ def transformSizeToClass(size):
 
     return output
 
+#Eventually let this function call find_element() instead of find_element_by_id()
+'''
+def attemptInput(idKey, value, maxAttempts):
+    result = False
+    attempts = 0
+    while (attempts < maxAttempts):
+        try:
+            driver.find_element_by_id(idKey).send_keys(value)
+            result = True
+            break;
+        except StaleElementReferenceException:
+            attempts = attempts + 1
+'''
+
+
+
 URL_product_url = "https://shop.bdgastore.com/collections/footwear/products/y-3-qasa-boot"
 URL_home_url = "https://shop.bdgastore.com/collections/footwear"
 user_size = '10'
@@ -103,7 +119,6 @@ driver.find_element_by_name("button").click()
 #Select Shipping Method
 #NOTE: Current case supported: Default shipping method already checked by default
 driver.find_element_by_name("button").click()
-time.sleep(6)
 
 #Input CC Info and Finalize
 #NOTE: Current case supported: CC Payment with billing address that differs from shipping address
@@ -111,8 +126,35 @@ cc_num = '4049379889248814'
 cc_name = 'Bob McFlymo'
 cc_expiry = '0318'
 cc_cvv = '233'
+'''
+try:
+    WebDriverWait(driver, 5).until(EC.presence_of_element_located(driver.find_element_by_id("number")))
+    print "Wait success"
+except TimeoutException:
+    print "Wait fail"
+'''
 
-driver.find_element_by_id("number").send_keys(cc_num)
+time.sleep(1)
+#For now, using this quick hack. It'd be nice to be able to find the custom keys that come after the card-fields-[key] that get generated
+#NOTE: Issue with entering CC num, class of input element changes based on first 4 digits and thus, the element becomes stale
+for iframe in driver.find_elements_by_class_name("card-fields-iframe"):
+    #print iframe.get_attribute("id")
+    if 'number' in iframe.get_attribute("id"):
+        print 'Number field found'
+        driver.switch_to_frame(iframe)
+        driver.find_element_by_id("number").send_keys(cc_num)
+        continue
+    elif 'name' in iframe.get_attribute("id"):
+        print 'Name field found'
+        continue
+    elif 'expiry' in iframe.get_attribute("id"):
+        print 'Expiry field found'
+        continue
+    elif 'verification' in iframe.get_attribute("id"):
+        print 'Verification value found'
+        continue
+
+'''
 driver.find_element_by_id("name").send_keys(cc_name)
 driver.find_element_by_id("expiry").send_keys(cc_expiry)
 driver.find_element_by_id("verification_value").send_keys(cc_cvv)
@@ -133,6 +175,7 @@ driver.find_element_by_id("checkout_billing_address_zip").send_keys(bill_zip)
 driver.find_element_by_id("checkout_billing_address_phone").send_keys(bill_phone)
 
 driver.find_element_by_name("button").click()
+'''
 
 
 end = timer()
