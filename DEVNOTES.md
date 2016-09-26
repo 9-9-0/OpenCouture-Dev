@@ -1,4 +1,6 @@
 # Dev Notes
+- 9/26 :
+	- Checkout works for Bodega. Next step: clean up code, optimize it, convert to OOP
 - 9/25 :
 	- Finished up the prototype for bodegaSEL.py. Works...almost. Damn third party payment solution providers...
 	- Figure out how to load CC info into that shopify payment box. Doesn't work like traditional input fields. 
