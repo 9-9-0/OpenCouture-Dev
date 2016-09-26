@@ -17,7 +17,6 @@ def transformSizeToClass(size):
     return output
 
 #Eventually let this function call find_element() instead of find_element_by_id()
-'''
 def attemptInput(idKey, value, maxAttempts):
     result = False
     attempts = 0
@@ -28,9 +27,7 @@ def attemptInput(idKey, value, maxAttempts):
             break;
         except StaleElementReferenceException:
             attempts = attempts + 1
-'''
-
-
+    return result
 
 URL_product_url = "https://shop.bdgastore.com/collections/footwear/products/y-3-qasa-boot"
 URL_home_url = "https://shop.bdgastore.com/collections/footwear"
@@ -137,15 +134,14 @@ except TimeoutException:
 time.sleep(1)
 #For now, using this quick hack. It'd be nice to be able to find the custom keys that come after the card-fields-[key] that get generated
 #NOTE: Issue with entering CC num, class of input element changes based on first 4 digits and thus, the element becomes stale
+
+driver.find_element_by_xpath("//iframe[starts-with(@name, 'card-fields-iframe-
+'''
 for iframe in driver.find_elements_by_class_name("card-fields-iframe"):
-    #print iframe.get_attribute("id")
-    if 'number' in iframe.get_attribute("id"):
-        print 'Number field found'
-        driver.switch_to_frame(iframe)
-        driver.find_element_by_id("number").send_keys(cc_num)
-        continue
-    elif 'name' in iframe.get_attribute("id"):
+    if 'name' in iframe.get_attribute("id"):
         print 'Name field found'
+        driver.switch_to_frame(iframe)
+        driver.find_element_by
         continue
     elif 'expiry' in iframe.get_attribute("id"):
         print 'Expiry field found'
@@ -153,7 +149,19 @@ for iframe in driver.find_elements_by_class_name("card-fields-iframe"):
     elif 'verification' in iframe.get_attribute("id"):
         print 'Verification value found'
         continue
+'''
+'''
+    #print iframe.get_attribute("id")
+    if 'number' in iframe.get_attribute("id"):
+        print 'Number field found'
+        driver.switch_to_frame(iframe)
 
+        for digit in cc_num:
+            result = attemptInput("number", digit, 5)
+            print result
+            driver.switch_to_default_content
+        continue
+'''
 '''
 driver.find_element_by_id("name").send_keys(cc_name)
 driver.find_element_by_id("expiry").send_keys(cc_expiry)
