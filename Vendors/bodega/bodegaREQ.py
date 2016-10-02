@@ -5,7 +5,9 @@ from selenium import webdriver
 import code
 import webbrowser
 import re
-import mechanize
+import time
+#NOTES: 
+# Header functionalities not implemented for this process, might add it in later
 
 #Functions used for testing, eventually incorporate into unit-tests
 def savePage( response, filename ):
@@ -20,13 +22,12 @@ def exitConf():
         if (input == 'E'):
             closeSession = True
 
-#################
-## Main Script ##
-#################
 class bodegaREQ():
     def __init__(self):
-        self.URL_vendor_url  = 'http://shop.bdgastore.com/'
-        self.URL_direct_link = 'http://shop.bdgastore.com/collections/footwear/products/y-3-pureboost-zg'
+        self.URL_vendor      = 'http://shop.bdgastore.com/'
+        self.URL_product     = 'http://shop.bdgastore.com/collections/footwear/products/y-3-pureboost-zg'
+        self.URL_addToCart   = 'http://shop.bdgastore.com/cart/add.js'
+        self.URL_cart        = 'http://shop.bdgastore.com/cart'
         self.user_size       = '8'
         self.user_session    = requests.Session()
 
@@ -36,7 +37,7 @@ class bodegaREQ():
         #Use BS to parse for <ul class="size options"
         #Size marked as follows: <li class="8 available" data-option-title="8"
         #Therefore, match data-option-title with user_size, then check the class for available keyword
-        session_get = self.user_session.get(self.URL_direct_link)
+        session_get = self.user_session.get(self.URL_product)
         print 'Status of requests.get: ' + str(session_get.status_code)
         soup = BeautifulSoup(session_get.content, "lxml")
         #Check that the lxml parser works for html
@@ -49,7 +50,7 @@ class bodegaREQ():
                 print 'Size ' + self.user_size + ' Available'
     
     def addToCart(self):
-        session_get = self.user_session.get(self.URL_direct_link)
+        session_get = self.user_session.get(self.URL_product)
         print 'Status of requests.get: ' + str(session_get.status_code)
         #savePage(session_get, 'test2.html')
 
@@ -58,88 +59,48 @@ class bodegaREQ():
         #Look to use SoupStrainer to improve parsing efficiency
 
         post_data = { 'id': '', 'properties[bot-key]': '' }
-
-        #Select from inside <select id="product-select"> element
-        #Find the attribute value corresponding with desired shoe size inside <option value="....">
-
-        results = soup.find_all('select', {'id':'product-select'}) 
-        foo = results[0].select('option')
-        print results
-        print
-        print foo
-
-
-
         
+        #Find bot key
+        results = soup.find('input', {'name':'properties[bot-key]'})
+        post_data['properties[bot-key]'] = results['value']
 
+        #Find corresponding size value
+        results = soup.find_all('select', {'id':'product-select'}) 
+        for option in results[0].select('option'):
+            size = re.sub('.* \/.', '', str(option.contents))
+            size = re.sub('.-.*', '', size)
+            if (size == self.user_size):
+                post_data['id'] = option['value']
+                #print post_data
+
+        session_post = self.user_session.post(url=self.URL_addToCart, data=post_data)
+
+        print "Add to cart post status: " + str(session_post.status_code)
+        #savePage(session_get, 'bodegaCart.html')
+
+    def loadCartAndCheckout(self):
+        #Import Cookies
+        driver = webdriver.Chrome(executable_path="./chromedriver")
+        driver.delete_all_cookies()
+        driver.get(self.URL_cart)
+
+        cookies = requests.utils.dict_from_cookiejar(self.user_session.cookies)
+        
+        for cookie in cookies.items():
+            cookie_dict = {'name': '',
+                           'value': '',
+                           'path': '/'}
+            cookie_dict['name'] = cookie[0]
+            cookie_dict['value'] = cookie[1]
+            driver.add_cookie(cookie_dict)
+                          
+        driver.get(self.URL_cart)
+        #time.sleep(5)
+        #driver.quit()
 
 
 if __name__ == '__main__':
     instance = bodegaREQ()
     instance.checkItemDirect()
     instance.addToCart()
-
-'''
-    def addToCart(self):
-        #Save the line below:
-        ResultSet = prod_soup.find_all('form', {'id' : 'qv-form'})
-    
-        ResultSetString = unicode.join(u'\n',map(unicode,ResultSet))
-        ResultSoup = BeautifulSoup(ResultSetString, "lxml")
-        #print ResultSoup.prettify()
-        with open('bodegaForm.html', 'wb') as bodegaFormFile:
-            bodegaFormFile.write(ResultSoup.prettify())
-
-        #select: name="id" value=22348567876 (11.5)
-        #input:  id="key" name="properties[bot-key]" type="hidden" value="6402243972
-
-        post_data = { 'id':'22348567876', 'properties[bot-key]':'6402243972' }
-        add_to_cart_js = 'http://shop.bdgastore.com/cart/add.js'
-        session_post = user_session.post(url=add_to_cart_js, data=post_data)
-
-        print str(session_post.status_code)
-
-        session_get = user_session.get('http://shop.bdgastore.com/cart')
-        savePage(session_get, 'bodegaCart.html')
-        #Note: This shows the cart is indeed added. See <div id='cart'>
-        #Possible reason this is not working: Firefox 3.x+ has a specific format for their cookies...double check this
-        checkCart(user_session)
-
-        #session_get  = user_session.get('http://shop.bdgastore.com/')
-        #print str(user_session.cookies) + '\n'
-
-        #cookies = dict_from_cookiejar(user_session.cookies)
-        #print cookies
-
-#driver = webdriver.Firefox()
-#driver.add_cookie(cookies)
-#driver.add_cookie({'path':'/'})
-#driver.get('http://shop.bdgastore.com/cart')
-#So the posted data gets accepted...but why doesn't the item show in the cart after the cookies get imported?
-#Possible Reason: cart_sig cookie is empty
-'''
-
-
-
-
-# Data of interest:
-#  <select class="" id="product-select" name="id">  <-- Corresponds to the value that will be sent over with add.js
-#  <input id="key" name="properties[bot-key]" type="hidden" value="6402243972"/>  <-- Value probably related to a Database Entry
-
-#for size in prod_soup.findAll('option'):
-#    if size.parent.name == 'select':
-#        print size
-#        print size['value']
-
-#print '\n'
-
-#arr = prod_soup.findAll('option')
-#print arr[0]
-#print arr[1]
-#print type(arr[0])
-
-#post_data = {
-#http://shop.bdgastore.com/cart/add.js
-
-#Uncomment ln 3 and 43 to launch into interpreter
-#code.interact(local=locals())
+    instance.loadCartAndCheckout()

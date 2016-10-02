@@ -1,4 +1,14 @@
 # Dev Notes
+- 10/1 :
+	- Finally solved the webdriver cookie injection issue. Prior it was a formatting issue that had gone unnoticed.
+	- Re-designing the process to support multithreading:
+		- Started looking into using PhantomJS...works good for single processes but apparently it's very difficult to implement a multithreading system on a server
+		- Imported PhantomJS to run Selenium headlessly, apparently the ghost driver is buggy and deprecated, couldn't run bodegaSEL.py with the chrome driver replaced with PhantomJS
+	- It looks like for now Python is the way to go, looking to optimize the code eventually by re-writing it in either C++ or simply using Nkuita to compile and optimize it.
+- 9/27 : 
+	- Started on adidas, not really though.
+	- Holding off on making any changes until I do some research and improve the checkout process with Selenium. Still looking into how to inject cookies from a requests session into Selenium webdriver. 
+	- Might look into implementing the quick and dirty Selenium process for Supreme
 - 9/26 :
 	- Checkout works for Bodega. Next step: clean up code, optimize it, convert to OOP
 - 9/25 :
