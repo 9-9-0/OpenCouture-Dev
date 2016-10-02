@@ -1,47 +1,52 @@
 # Dev Notes
-- 10/1 :
+**Please ignore my grammar. CBA to write as a pedant when making cursory notes**
+- **10/2**:
+	- Replaced all replaceable time.sleep calls in bodegaREQ.py with Selenium's wait functionality as noted in their documentation
+	- BodegaSEL.py now runs about 3 seconds faster on average. Still, most of the time consists of the overhead in starting the driver
+	- Sending a pull request to OpenATC, might be mutually beneficial to have all the selenium stuff as a reference
+- **10/1** :
 	- Finally solved the webdriver cookie injection issue. Prior it was a formatting issue that had gone unnoticed.
 	- Re-designing the process to support multithreading:
 		- Started looking into using PhantomJS...works good for single processes but apparently it's very difficult to implement a multithreading system on a server
 		- Imported PhantomJS to run Selenium headlessly, apparently the ghost driver is buggy and deprecated, couldn't run bodegaSEL.py with the chrome driver replaced with PhantomJS
 	- It looks like for now Python is the way to go, looking to optimize the code eventually by re-writing it in either C++ or simply using Nkuita to compile and optimize it.
-- 9/27 : 
+- **9/27** : 
 	- Started on adidas, not really though.
 	- Holding off on making any changes until I do some research and improve the checkout process with Selenium. Still looking into how to inject cookies from a requests session into Selenium webdriver. 
 	- Might look into implementing the quick and dirty Selenium process for Supreme
-- 9/26 :
+- **9/26** :
 	- Checkout works for Bodega. Next step: clean up code, optimize it, convert to OOP
-- 9/25 :
+- **9/25** :
 	- Finished up the prototype for bodegaSEL.py. Works...almost. Damn third party payment solution providers...
 	- Figure out how to load CC info into that shopify payment box. Doesn't work like traditional input fields. 
-- 9/23 :
+- **9/23** :
 	- Moving away from requests and bs4 library. Selenium Headless definitely seems like a better choice when it comes to pressing buttons and having scripts execute (should work with adidas when completed)
 	- Building the script for bodega first, already running into issues. See issues.
-- 9/17 :
+- **9/17** :
 	- Big obstacle: the data that's inputted into the forms on the checkout page gets packaged and sent to cybersource for payment processing. Having trouble finding which script does this. Included a relevant one in /Vendors/adidas/Data/5/cybersource.js 
 	- If this part of the step can't be fully automated, might have to resort to importing cookies into a selenium web driver and opening up the page from there. And of course, there hasn't been effort on figuring out why that didn't work in the first place...
-- 9/14 :
+- **9/14** :
 	- Find ways to optimize what we have so far. 3.3 seconds on average seems a bit much. Gets hung up on the enterShipBill() method, perhaps there's a lot of overhead in retrieving the dictionary 
 by reference...
 	- Tested a run with the custInfo dictionary within scope of instance function and ran .5 seconds faster on average. How do I maintain OOP functionality while leaving data within their respective functions? Perhaps macros?
-- 9/13 :
+- **9/13** :
 	- More problems: Adidas has implemented a 10 minute checkout + Captcha on certain exclusive items (https://www.adidas.com/us/eqt-support-93-16-shoes/S79921.html)
 	- Check DeathByCaptcha and see if their paid API is worth implementing
 	- ~~Code Issues: Shipping and Billing info gets posted, but subsequent retrieval of payment information page redirects to where delivery-start directs to. Find out what's going on~~ Copied form data from chrome into adidasREQ.py and it works. Guess I was missing some fields.
-- 9/12 (Additional) :
+- **9/12 (Additional)** :
 	- Created a folder with all of the headers sent during various parts of the purchase process. The headers sent by the program should reflect these state changes.
 	- Tentative, near-finalized post data for the ship/bill info written out. Saved the entire form that's sent within the HeadersForm folder
 	- Don't use BeautifulSoup.findAll if .find can be used instead. Saves some overhead
-- 9/12 :
+- **9/12** :
 	- Another potential checkout process. There's a mpstat.us post sent when you click "Review and Pay" on the shipping forms page. This may require us to look into Selenium or find a way to emulate an actual browser submitting this (with little overhead). Selenium Headless?
-- 9/11 :
+- **9/11** :
 	- Potential problem found with Adidas' checkout process. There are two scripts in question: id="delivery-form-config" and the script that comes after it. I'm not sure if they package up the user's inputted data and then posts it up to the server, or if it's related to a process that occurs when the user gets the checkout page.
 	- Anyhoooo, this is something to consider if the script doesn't work. Consulting an "expert" later for some advice. For now, the script will post the data with the names contained in the input fieldsets.
-- 9/9 : 
+- **9/9** : 
 	- Noticed that the headers of the get and post requests differed after inspecting them. Revised the headers and added functionality that modifies the referer key based on step in the process
 	- Consider using Vultr and Blazing SEO to test mass executions next week
 	- Add Error Handling Functionality once the checkout process for Adidas is complete
-- 9/8 : 
+- **9/8** : 
 - 	- **Design Modification**: Figure out if the current OOP model supports cookie persistence between adding to cart and checking out (for example: adding to the cart may succeed on the first attempt, but it may take multiple subsequent attempts to successfully checkout)
 	- Look into python's timeit functionality to time various operations
 	- Revise the main README.md and remove MECH and SEL variants. Mechanize lacks functionality and Selenium may be too slow
@@ -50,8 +55,8 @@ by reference...
 	- At some point, make use of <option>'s data-maxavailable and data-status attributes for error checking in addToCart()
 	- A consideration for the regex expression used: ^8+$ (matches shoe size 8). Pretty sure that this'll match 88, 808, 818, etc. Maybe look to refine this in case websites want to throw a curveball.
 	- Issue occurs when matching the item.string content since the shoe size is embeddd in \n and \t. Two options: strip it with python's built in string function and then perform a regex search on it, or use a regex substitution. Temporarily going with the latter as someone mentioned it's actually quicker (COMPARE THE SPEEDS YOURSELF AT SOME POINT)
-- 8/30: 
+- **8/30**: 
 	- Look into the following libraries to use: mechanize, selenium (headless)
 	- Clean up bodega.py once it's fully functional
 	- !Figure out why item isn't showing up in cart despite importing the cookies (correctly?)
-- 8/29: Review Unicode encodings, why writing to file has issues when it's not encoded correctly
+- **8/29**: Review Unicode encodings, why writing to file has issues when it's not encoded correctly
