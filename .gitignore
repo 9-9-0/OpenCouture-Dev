@@ -1,3 +1,9 @@
 **/.html
 **/chromedriver
 **/.*.swp
+
+
+
+**/phantomjs
+**/ghostdriver.log
+**/Screen.png

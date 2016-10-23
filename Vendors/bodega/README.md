@@ -1,5 +1,7 @@
 # Notes
 
+To run these scripts, make sure you add the required drivers (i.e. chromedriver, phantomJS) to the script's directory. Latest versions should work fine.
+
 ### bodegaSEL.py
 
 Basic structure of the credit card input section on the checkout page is like this: 

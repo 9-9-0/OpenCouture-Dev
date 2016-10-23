@@ -1,5 +1,8 @@
 # Dev Notes
 **Please ignore my grammar. CBA to write as a pedant when making cursory notes**
+-**10/23**:
+	- Resumed development...for now. New design ideas will be relayed soon. Efforts will be mainly directed towards acquiring sitekeys, clientIDs, and other information from Adidas' online webstore to make automation easier.
+	- Begun testing PhantomJS with bodega's working shopify script. Screenshots come out strange, may be due to unicode format.
 - **10/2**:
 	- Replaced all replaceable time.sleep calls in bodegaREQ.py with Selenium's wait functionality as noted in their documentation
 	- BodegaSEL.py now runs about 3 seconds faster on average. Still, most of the time consists of the overhead in starting the driver
